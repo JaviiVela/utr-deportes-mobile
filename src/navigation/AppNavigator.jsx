@@ -1,50 +1,79 @@
-import {
-  View,
-  Text,
-  Pressable,
-  ActivityIndicator,
-  StyleSheet,
-} from "react-native";
+import { View, Text, ActivityIndicator, StyleSheet } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Svg, { Circle, Path, Rect } from "react-native-svg";
 import { useAuth } from "../context/AuthContext";
 import LoginScreen from "../screens/LoginScreen";
 import RegisterScreen from "../screens/RegisterScreen";
 import ForbiddenScreen from "../screens/ForbiddenScreen";
+import InventoryScreen from "../screens/InventoryScreen";
+import MyLoansScreen from "../screens/MyLoansScreen";
 import { COLORS } from "../utils/theme";
 
 const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
 
-const TempDashboardScreen = ({ navigation }) => {
-  const { user, isAdmin, logout } = useAuth();
-
+const MainTabs = () => {
   return (
-    <View style={styles.container}>
-      <View style={styles.card}>
-        <Text style={styles.kicker}>SESIÓN ACTIVA · EQUIPO-B2</Text>
-        <Text style={styles.title}>{user?.nombre}</Text>
-        <Text style={styles.role}>Rol activo: {user?.rol}</Text>
+    <Tab.Navigator
+      screenOptions={{
+        headerShown: false,
+        tabBarActiveTintColor: COLORS.navy,
+        tabBarInactiveTintColor: COLORS.textMuted,
+        tabBarStyle: {
+          height: 62,
+          paddingBottom: 8,
+          paddingTop: 6,
+          borderTopColor: COLORS.borderLight,
+          backgroundColor: COLORS.white,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: "700",
+        },
+      }}
+    >
+      <Tab.Screen
+        name="Inventario"
+        component={InventoryScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Svg
+              width={size}
+              height={size}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={color}
+              strokeWidth={2}
+            >
+              <Circle cx="12" cy="12" r="9" />
+              <Path d="M12 7v10M7 12h10" />
+            </Svg>
+          ),
+        }}
+      />
 
-        <Pressable
-          style={styles.testAdminBtn}
-          onPress={() => {
-            if (!isAdmin) {
-              navigation.navigate("Forbidden");
-            }
-          }}
-        >
-          <Text style={styles.testAdminText}>
-            {isAdmin
-              ? "Acceso Admin Habilitado"
-              : "Probar Acceso Restringido (403)"}
-          </Text>
-        </Pressable>
-
-        <Pressable style={styles.logoutBtn} onPress={logout}>
-          <Text style={styles.logoutText}>Cerrar Sesión</Text>
-        </Pressable>
-      </View>
-    </View>
+      <Tab.Screen
+        name="Mis Préstamos"
+        component={MyLoansScreen}
+        options={{
+          tabBarIcon: ({ color, size }) => (
+            <Svg
+              width={size}
+              height={size}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke={color}
+              strokeWidth={2}
+            >
+              <Rect x="4" y="4" width="16" height="16" rx="3" />
+              <Path d="M8 10h8M8 14h5" />
+            </Svg>
+          ),
+        }}
+      />
+    </Tab.Navigator>
   );
 };
 
@@ -70,10 +99,7 @@ const AppNavigator = () => {
           </>
         ) : (
           <>
-            <Stack.Screen
-              name="TempDashboard"
-              component={TempDashboardScreen}
-            />
+            <Stack.Screen name="MainTabs" component={MainTabs} />
             <Stack.Screen name="Forbidden" component={ForbiddenScreen} />
           </>
         )}
@@ -90,49 +116,6 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bgPage,
   },
   loaderText: { marginTop: 10, color: COLORS.navy, fontWeight: "600" },
-  container: {
-    flex: 1,
-    justifyContent: "center",
-    padding: 20,
-    backgroundColor: COLORS.bgPage,
-  },
-  card: {
-    backgroundColor: COLORS.white,
-    padding: 22,
-    borderRadius: 18,
-    borderWidth: 1,
-    borderColor: COLORS.borderLight,
-    borderTopWidth: 4,
-    borderTopColor: COLORS.navy,
-  },
-  kicker: {
-    fontSize: 11,
-    fontWeight: "800",
-    color: COLORS.redAccent,
-    marginBottom: 4,
-  },
-  title: { fontSize: 20, fontWeight: "800", color: COLORS.navy },
-  role: {
-    fontSize: 14,
-    color: COLORS.textMuted,
-    marginTop: 2,
-    marginBottom: 18,
-  },
-  testAdminBtn: {
-    backgroundColor: COLORS.navyLight,
-    padding: 13,
-    borderRadius: 10,
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  testAdminText: { color: COLORS.navy, fontWeight: "700", fontSize: 14 },
-  logoutBtn: {
-    backgroundColor: COLORS.crimson,
-    padding: 13,
-    borderRadius: 10,
-    alignItems: "center",
-  },
-  logoutText: { color: COLORS.white, fontWeight: "700", fontSize: 14 },
 });
 
 export default AppNavigator;
